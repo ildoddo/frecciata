@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, system-ui;
+
+  /* Palette: carta calda, inchiostro, il rosso del bersaglio */
+  --color-paper: #faf8f5;
+  --color-card: #ffffff;
+  --color-ink: #221c15;
+  --color-ink-soft: #6b6259;
+  --color-line: #e8e2d9;
+  --color-target: #c23c2a;
+  --color-target-deep: #9d2f21;
+  --color-lane: #2f6b4f;
+  --color-lane-soft: #eaf3ee;
+  --color-amber-soft: #fbf3e2;
+
+  --shadow-card: 0 1px 2px rgb(34 28 21 / 0.05), 0 4px 16px rgb(34 28 21 / 0.05);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+  ::selection {
+    @apply bg-target/20;
+  }
+}

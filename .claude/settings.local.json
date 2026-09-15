@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Read(//Library/Application Support/**)",
+      "Read(//Users/gdoddis/.claude/**)",
+      "Read(//Users/gdoddis/.local/lib/node_modules/**)",
+      "Read(//Users/gdoddis/.local/share/claude/**)"
+    ]
+  }
+}

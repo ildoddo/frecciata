@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ATLETA
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ATLETA)
+  createdAt    DateTime @default(now())
+  bookings     Booking[]
+}
+
+model RecurringRule {
+  id          String         @id @default(cuid())
+  label       String?
+  // 0 = domenica ... 6 = sabato (getDay)
+  daysOfWeek  Int[]
+  // ore 24h nel fuso del club: "18:00"
+  startTime   String
+  endTime     String
+  // date (sole), conservate a mezzanotte UTC
+  startsOn    DateTime
+  endsOn      DateTime
+  maxAthletes Int            @default(8)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  slots       TrainingSlot[]
+}
+
+model TrainingSlot {
+  id              String         @id @default(cuid())
+  start           DateTime
+  end             DateTime
+  maxAthletes     Int            @default(8)
+  recurringRuleId String?
+  rule            RecurringRule? @relation(fields: [recurringRuleId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([start])
+}
+
+model Booking {
+  id        String       @id @default(cuid())
+  userId    String
+  slotId    String
+  // giorno solare locale del club (YYYY-MM-DD): rende vincolante
+  // "un turno al giorno" direttamente a livello di database
+  day       String
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slot      TrainingSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, slotId]) // stesso utente non prenota lo stesso turno due volte
+  @@unique([userId, day]) // un solo turno per giorno solare
+  @@index([slotId])
+  @@index([day])
+}
