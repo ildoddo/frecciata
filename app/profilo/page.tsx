@@ -53,7 +53,7 @@ export default function ProfiloPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <AuthCard title="Il mio profilo">
+      <AuthCard title="Il mio profilo" subtitle="Cambia la tua password">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="current" className="block text-sm font-medium mb-1">
