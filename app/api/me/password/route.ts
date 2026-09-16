@@ -20,7 +20,7 @@ export async function PATCH(req: Request) {
     const dbUser = await db.user.findUnique({ where: { id: user.id } });
     if (!dbUser) throw new ApiError(404, "Utente non trovato");
 
-    const valid = await bcrypt.compare(currentPassword, dbUser.password);
+    const valid = await bcrypt.compare(currentPassword, dbUser.passwordHash);
     if (!valid) {
       throw new ApiError(401, "Password corrente non corretta");
     }
@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
     // Aggiorna la password
     await db.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword },
+      data: { passwordHash: hashedPassword },
     });
 
     return NextResponse.json({ ok: true });
