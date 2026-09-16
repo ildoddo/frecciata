@@ -5,7 +5,8 @@
       "Read(//Library/Application Support/**)",
       "Read(//Users/gdoddis/.claude/**)",
       "Read(//Users/gdoddis/.local/lib/node_modules/**)",
-      "Read(//Users/gdoddis/.local/share/claude/**)"
+      "Read(//Users/gdoddis/.local/share/claude/**)",
+      "Bash(curl -s http://localhost:3000)"
     ]
   }
 }
