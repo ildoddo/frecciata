@@ -11,6 +11,25 @@ Usabile da mobile e desktop, con pannello di amministrazione per turni e regole 
 - **NextAuth.js** (v4, credentials, session JWT) con ruoli `ADMIN` / `ATLETA`
 - Target deploy: **Vercel** (piano gratuito, con Vercel Postgres/Neon)
 
+## Funzionalità
+
+### Area atleta
+- **Registrazione e login** con email e password
+- **Profilo utente** con possibilità di cambiare password
+- **Calendario turni** con vista settimanale e giornaliera
+- **Prenotazione** con un click (vincolo: un solo turno al giorno)
+- **Le mie prenotazioni** con lista turni futuri e possibilità di annullamento
+
+### Area admin
+- **Gestione turni singoli**: crea, modifica ed elimina turni
+- **Regole ricorrenti**: genera automaticamente turni su base settimanale
+- **Gestione utenti**: visualizza lista completa degli atleti registrati
+  - Abilita/disabilita utenti (utile per chi non paga la quota)
+  - Utenti disabilitati non possono accedere all'app
+  - Visualizza numero prenotazioni per utente
+- **Visualizzazione atleti iscritti** per ogni turno
+- **Controllo capienza massima** per turno
+
 ## Regole di business
 
 1. **Un solo turno al giorno solare per atleta** — il giorno solare è calcolato nel fuso del club (`CLUB_TIMEZONE`). È vincolato due volte:
@@ -56,7 +75,7 @@ npm run dev                 # http://localhost:3000
 
 ## Modello dati
 
-- **User** — nome, email, password (hash bcrypt), ruolo `ADMIN|ATLETA`
+- **User** — nome, email, password (hash bcrypt), ruolo `ADMIN|ATLETA`, stato attivo/disabilitato
 - **TrainingSlot** — inizio/fine (UTC), capienza massima, opzionale link alla regola che l'ha generato
 - **RecurringRule** — giorni della settimana, orari, data inizio/fine; genera i `TrainingSlot`
 - **Booking** — utente + turno + giorno solare; vincoli unici `(userId, slotId)` e `(userId, day)`
@@ -77,8 +96,8 @@ Le migrazioni vivono in `prisma/migrations/` e vengono applicate:
    - `AUTH_SECRET` (genera un valore nuovo, non quello locale)
    - `CLUB_TIMEZONE` e `NEXT_PUBLIC_CLUB_TIMEZONE` (es. entrambi `Europe/Rome`)
    - Opzionale: `ADMIN_EMAIL`/`ADMIN_NAME`/`ADMIN_PASSWORD`
-4. **Build command** (se Vercel non lo deduce): `prisma migrate deploy && next build`
-   — le migrazioni si applicano automaticamente a ogni deploy.
+4. **Build command**: `prisma generate && next build`
+   — `prisma generate` rigenera il client Prisma, poi `next build` compila l'app.
 5. **Deploy** → al primo deploy senza admin, esegui il seed:
    ```bash
    npx prisma db execute  # oppure dal CLI con l'URL di produzione:
@@ -95,18 +114,25 @@ Le migrazioni vivono in `prisma/migrations/` e vengono applicate:
 app/
   calendario/        area atleta: vista settimana/giorno, prenotazione con un click
   prenotazioni/      i propri turni futuri + annullamento
+  profilo/           cambio password utente
   admin/             pannello: CRUD turni, regole ricorrenti, atleti per turno
+    utenti/          gestione utenti (abilita/disabilita account)
   login/ registrazione/
   api/
     auth/[...nextauth]  sessione (JWT) con ruolo
     register            creazione account ATLETA
     slots, rules        CRUD admin (+ elenco con atleti)
     bookings            prenota/annulla (vincoli applicati qui, lato server)
-    me/bookings         propri turni futuri
+    me/
+      bookings          propri turni futuri
+      password          cambio password
+    admin/
+      users             lista e gestione utenti (solo admin)
 lib/
   rules.ts           vincoli di business (un-turno-al-giorno, capienza)
   tz.ts              fuso del club: conversioni UTC <-> locale, aritmetica giorni
   auth.ts            opzioni NextAuth (credentials + Prisma + bcrypt)
+  guards.ts          controlli autenticazione e autorizzazione
 middleware.ts        protegge /admin (solo ADMIN) e le pagine atleta
 prisma/
   schema.prisma      User, TrainingSlot, RecurringRule, Booking
@@ -116,6 +142,15 @@ components/          UI (calendario, card turni, pannello admin, toast, nav)
 
 ## Note
 
+- **Gestione utenti disabilitati**:
+  - Gli utenti disabilitati non possono fare login
+  - Ricevono il messaggio "Account disabilitato. Contatta l'amministrazione."
+  - Le loro prenotazioni esistenti rimangono nel database
+  - Utile per gestire atleti che non hanno pagato la quota di iscrizione
+- **Cambio password**:
+  - Ogni utente può cambiare la propria password dalla pagina `/profilo`
+  - Richiede la password corrente per conferma
+  - La nuova password deve essere di almeno 8 caratteri
 - **Cosa succede quando l'admin modifica/elimina un turno già prenotato**:
   - *cambia orario entro lo stesso giorno* → le prenotazioni restano;
   - *cambia giorno* → le prenotazioni si trasferiscono, salvo conflitti (errore chiaro se qualcuno avrebbe due turni nel nuovo giorno);
