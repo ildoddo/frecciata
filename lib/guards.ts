@@ -1,16 +1,10 @@
 import { getServerSession } from "next-auth";
-import type { NextRequest } from "next/server";
 import type { Session } from "next-auth";
 import { authOptions } from "./auth";
 import { ApiError } from "./api-error";
 
 /** Sessione per server components e route handler. */
-export async function getSession(req?: Request): Promise<Session | null> {
-  // Nei route handler il cookie arriva dalla Request: la passiamo
-  // esplicitamente per non dipendere dai global di runtime.
-  if (req) {
-    return getServerSession(authOptions, req as NextRequest, new Response());
-  }
+export async function getSession(): Promise<Session | null> {
   return getServerSession(authOptions);
 }
 

@@ -3,7 +3,7 @@ import { ApiError } from "./api-error";
 import { Prisma } from "@prisma/client";
 
 // Wrapper unificato: mappa errori di dominio e Prisma in risposte JSON.
-export async function handleApi<T>(fn: () => Promise<T>): Promise<Response> {
+export async function handleApi(fn: () => Promise<Response>): Promise<Response> {
   try {
     return await fn();
   } catch (e) {

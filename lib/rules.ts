@@ -344,7 +344,7 @@ export async function listSlots(opts: {
       )
     : new Set<string>();
 
-  return slots.map((s) => ({
+  return slots.map((s: any) => ({
     id: s.id,
     day: localDay(s.start),
     start: s.start.toISOString(),
@@ -354,7 +354,7 @@ export async function listSlots(opts: {
     mine: mySlotIds.has(s.id),
     ruleLabel: s.rule?.label ?? null,
     athletes: opts.withAthletes
-      ? s.bookings.map((b) => ({ name: b.user.name, email: b.user.email, role: b.user.role }))
+      ? s.bookings.map((b: any) => ({ name: b.user.name, email: b.user.email, role: b.user.role }))
       : undefined,
   }));
 }

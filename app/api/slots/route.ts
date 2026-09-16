@@ -29,7 +29,7 @@ export async function GET(req: Request) {
     // attraversa anche da pagina; il login vero arriva nel middleware UI).
     let session: Awaited<ReturnType<typeof getSession>> = null;
     try {
-      session = await getSession(req);
+      session = await getSession();
     } catch {
       session = null;
     }
@@ -57,7 +57,7 @@ const createSchema: z.ZodType<SlotInput> = z.object({
 
 export async function POST(req: Request) {
   return handleApi(async () => {
-    requireAdmin(await getSession(req));
+    requireAdmin(await getSession());
     const input = createSchema.parse(await req.json());
     const slot = await createSlot(input);
     return NextResponse.json({ id: slot.id }, { status: 201 });

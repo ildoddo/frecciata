@@ -5,7 +5,7 @@ import { handleApi } from "@/lib/handle-api";
 
 export async function GET(req: Request) {
   return handleApi(async () => {
-    const user = requireUser(await getSession(req));
+    const user = requireUser(await getSession());
     const bookings = await listMyBookings(user.id);
     return NextResponse.json({ bookings });
   });

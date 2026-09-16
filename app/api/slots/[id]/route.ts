@@ -16,7 +16,7 @@ const patchSchema = z.object({
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return handleApi(async () => {
     const { id } = await params;
-    requireUser(await getSession(req)); // login richiesto
+    requireUser(await getSession()); // login richiesto
     const slot = await db.trainingSlot.findUnique({
       where: { id },
       include: { _count: { select: { bookings: true } } },
@@ -39,7 +39,7 @@ export async function PATCH(
 ) {
   return handleApi(async () => {
     const { id } = await params;
-    requireAdmin(await getSession(req));
+    requireAdmin(await getSession());
     const input = patchSchema.parse(await req.json());
     await updateSlot(id, input);
     return NextResponse.json({ ok: true });
@@ -52,7 +52,7 @@ export async function DELETE(
 ) {
   return handleApi(async () => {
     const { id } = await params;
-    requireAdmin(await getSession(req));
+    requireAdmin(await getSession());
     const { canceled } = await deleteSlot(id);
     return NextResponse.json({ ok: true, canceled });
   });

@@ -10,7 +10,7 @@ export async function PATCH(
 ) {
   return handleApi(async () => {
     const { id } = await params;
-    requireAdmin(await getSession(req));
+    requireAdmin(await getSession());
     const input = ruleSchema.parse(await req.json());
     await updateRule(id, input);
     return NextResponse.json({ ok: true });
@@ -23,7 +23,7 @@ export async function DELETE(
 ) {
   return handleApi(async () => {
     const { id } = await params;
-    requireAdmin(await getSession(req));
+    requireAdmin(await getSession());
     const { slots } = await deleteRule(id);
     return NextResponse.json({ ok: true, slots });
   });
