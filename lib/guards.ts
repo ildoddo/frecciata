@@ -13,6 +13,12 @@ export function requireUser(session: Session | null) {
   if (!session?.user?.id) {
     throw new ApiError(401, "Accesso non autorizzato: fai il login.");
   }
+
+  // Blocca utenti disabilitati
+  if (session.user.active === false) {
+    throw new ApiError(403, "Account disabilitato. Contatta l'amministrazione.");
+  }
+
   return session.user;
 }
 

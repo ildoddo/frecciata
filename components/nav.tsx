@@ -47,6 +47,7 @@ export function Nav() {
               {link("/calendario", "Calendario")}
               {link("/prenotazioni", "Prenotazioni")}
               {isAdmin && link("/admin", "Pannello")}
+              {isAdmin && link("/admin/utenti", "Utenti")}
               <span className="mx-1 hidden h-4 w-px shrink-0 bg-line sm:block" aria-hidden />
               {link("/profilo", "Profilo")}
               <span className="hidden max-w-32 truncate text-sm text-ink-soft sm:block">
